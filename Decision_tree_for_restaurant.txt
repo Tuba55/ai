@@ -1,0 +1,50 @@
+data.cvs file:
+
+import csv
+with open('data.csv',mode='w')as csv_file:
+
+    fieldnames=['Alt','Bar','Fri','Hun','Pat','Price','Rain','Res','Type','Est','Goal']
+    writer = csv.DictWriter(csv_file,fieldnames= fieldnames)
+    writer.writeheader()
+    writer.writerow({'Alt':'Yes','Bar':'No','Fri':'No','Hun':'Yes','Pat':'Some','Price':'100','Rain':'No','Res':'Yes','Type':'French','Est':'0-10','Goal':'Yes'})
+    writer.writerow({'Alt':'Yes','Bar':'No','Fri':'No','Hun':'Yes','Pat':'Full','Price':'10','Rain':'No','Res':'No','Type':'Thai','Est':'30-60','Goal':'No'})
+    writer.writerow({'Alt':'No','Bar':'Yes','Fri':'No','Hun':'No','Pat':'Some','Price':'10','Rain':'No','Res':'No','Type':'Burger','Est':'0-10','Goal':'Yes'})
+    writer.writerow({'Alt':'Yes','Bar':'No','Fri':'Yes','Hun':'Yes','Pat':'Full','Price':'10','Rain':'Yes','Res':'No','Type':'Thai','Est':'10-30','Goal':'Yes'})
+    writer.writerow({'Alt':'Yes','Bar':'No','Fri':'Yes','Hun':'Yes','Pat':'Full','Price':'100','Rain':'No','Res':'Yes','Type':'French','Est':'>60','Goal':'No'})
+    writer.writerow({'Alt':'No','Bar':'Yes','Fri':'No','Hun':'Yes','Pat':'Some','Price':'75','Rain':'Yes','Res':'Yes','Type':'Italian','Est':'0-10','Goal':''})
+
+Practical 05 Code:
+
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.feature_extraction import DictVectorizer
+from sklearn import tree
+import warnings
+from sklearn.metrics import accuracy_score,classification_report
+warnings.filterwarnings(action='ignore',category=DeprecationWarning)
+data=pd.read_csv('data.csv')
+cols_to_retain=['Alt','Bar','Fri','Hun','Pat','Price','Rain','Res','Type','Est']
+
+X_feature=data[cols_to_retain]
+X_dict=X_feature.T.to_dict().values()
+
+vect=DictVectorizer(sparse=False)
+X_vector=vect.fit_transform(X_dict)
+print(X_vector)
+
+X_Train=X_vector[:-1]
+X_Test=X_vector[-1:]
+
+print('Train set')
+print(X_Train)
+print('test set')
+print(X_Test)
+
+le=LabelEncoder()
+y_train=le.fit_transform(data['Goal'][:-1])
+
+clf= tree.DecisionTreeClassifier(criterion='entropy')
+clf=clf.fit(X_Train,y_train)
+print('test data')
+print(le.inverse_transform(clf.predict(X_Test)))
